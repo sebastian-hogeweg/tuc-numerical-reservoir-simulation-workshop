@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="author" content="Sebastian Hogeweg">
+  <title>Reservoir Modelling Workshop - Exercise 1</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/reveal.css">
+  <style>
+    .reveal .sourceCode {
+      /* see #7635 */
+      overflow: visible;
+    }
+
+    code {
+      white-space: pre-wrap;
+    }
+
+    span.smallcaps {
+      font-variant: small-caps;
+    }
+
+    div.columns {
+      display: flex;
+      gap: min(4vw, 1.5em);
+    }
+
+    div.column {
+      flex: auto;
+      overflow-x: auto;
+    }
+
+    div.hanging-indent {
+      margin-left: 1.5em;
+      text-indent: -1.5em;
+    }
+
+    ul.task-list[class] {
+      list-style: none;
+    }
+
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/theme/serif.css" id="theme">
+
+  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/default.min.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+
+  <!-- and it's easy to individually load additional languages -->
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/languages/go.min.js"></script>
+
+  <script>hljs.highlightAll();</script>
+  <style>
+    /* @import url(./fonts/source-sans-pro/source-sans-pro.css);
+  section.has-dark-background, section.has-dark-background h1, section.has-dark-background h2, section.has-dark-background h3, section.has-dark-background h3, section.has-dark-background h5, section.has-dark-background h6 {
+    color: #fff;
+  } */
+
+    @font-face {
+      font-family: "Computer Modern";
+      src: url("assets/CMU/Sans/cmunss.ttf");
+    }
+
+    @font-face {
+      font-family: "Computer Modern";
+      src: url("assets/CMU/Sans/cmunsx.ttf");
+      font-weight: bold;
+    }
+
+    @font-face {
+      font-family: "CMUSansSerif-Bold";
+      src: url("assets/CMU/Sans/cmunsx.ttf");
+      font-weight: bold;
+    }
+
+    @font-face {
+      font-family: 'CMUSansSerif-Bold', 'CMU Sans Serif';
+      src: url("assets/CMU/Sans/cmunsx.ttf");
+      font-weight: bold;
+    }
+
+    /*********************************************
+   * GLOBAL STYLES
+   *********************************************/
+    :root {
+      --r-background-color: #fff;
+      --r-main-font: "Computer Modern", sans-serif;
+      --r-main-font-size: 25px;
+      --r-main-color: #222;
+      --r-block-margin: 20px;
+      --r-heading-margin: 0 0 20px 0;
+      --r-heading-font: "Computer Modern", sans-serif;
+      --r-heading-color: #222;
+      --r-heading-line-height: 1.2;
+      --r-heading-letter-spacing: normal;
+      /* --r-heading-text-transform: uppercase; */
+      --r-heading-text-shadow: none;
+      --r-heading-font-weight: 600;
+      --r-heading1-text-shadow: none;
+      --r-heading1-size: 1.8em;
+      --r-heading2-size: 1.6em;
+      --r-heading3-size: 1.3em;
+      --r-heading4-size: 1em;
+      --r-footer-size: 1em;
+      --r-code-font: monospace;
+      --r-link-color: rgb(0, 140, 79);
+      --r-link-color-dark: #1a53a1;
+      --r-link-color-hover: rgb(128, 128, 128);
+      --r-footer-color: rgb(128, 128, 128);
+      --r-selection-background-color: rgb(128, 128, 128);
+      --r-selection-color: #fff;
+    }
+
+    .reveal-viewport {
+      background: #fff;
+      background-color: var(--r-background-color);
+
+    }
+
+
+    .reveal {
+      font-family: var(--r-main-font);
+      font-size: var(--r-main-font-size);
+      font-weight: normal;
+      color: var(--r-main-color);
+      background-image: url("assets/Logo_TUC_de_CMYK.svg"), radial-gradient(#fff, #DCDCDC);
+      background-size: 25%, 100%;
+      background-repeat: no-repeat;
+      background-position: left 15px top 15px, left 0px top 0px;
+      /* background: radial-gradient(#fff, rgb(128, 128, 128)); */
+    }
+
+
+    .reveal ::selection {
+      color: var(--r-selection-color);
+      background: var(--r-selection-background-color);
+      text-shadow: none;
+    }
+
+    .reveal ::-moz-selection {
+      color: var(--r-selection-color);
+      background: var(--r-selection-background-color);
+      text-shadow: none;
+    }
+
+    .reveal .slides section,
+    .reveal .slides section>section {
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      line-height: 1.3;
+      font-weight: inherit;
+    }
+
+
+
+
+    /*********************************************
+   * HEADERS
+   *********************************************/
+    .reveal h1,
+    .reveal h2,
+    .reveal h3,
+    .reveal h4,
+    .reveal h5,
+    .reveal h6 {
+      margin: var(--r-heading-margin);
+      color: var(--r-heading-color);
+      font-family: var(--r-heading-font);
+      font-weight: var(--r-heading-font-weight);
+      line-height: var(--r-heading-line-height);
+      letter-spacing: var(--r-heading-letter-spacing);
+      word-wrap: break-word;
+    }
+
+    .reveal h1 {
+      font-size: var(--r-heading1-size);
+    }
+
+    .reveal h2 {
+      font-size: var(--r-heading2-size);
+    }
+
+    .reveal h3 {
+      font-size: var(--r-heading3-size);
+    }
+
+    .reveal h4 {
+      font-size: var(--r-heading4-size);
+    }
+
+    .reveal h1 {
+      text-shadow: var(--r-heading1-text-shadow);
+    }
+
+
+    /*********************************************
+   * OTHER
+   *********************************************/
+
+    .reveal p {
+      margin: var(--r-block-margin) 0;
+      /* text-align: center; */
+      line-height: 1.3;
+    }
+
+    /* Remove trailing margins after titles */
+    .reveal h1:last-child,
+    .reveal h2:last-child,
+    .reveal h3:last-child,
+    .reveal h4:last-child,
+    .reveal h5:last-child,
+    .reveal h6:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Ensure certain elements are never larger than the slide itself */
+    .reveal img,
+    .reveal video,
+    .reveal iframe {
+      max-width: 150%;
+      max-height: 150%;
+    }
+
+    .reveal strong,
+    .reveal b {
+      font-weight: bold;
+    }
+
+    /* .reveal em {
+    font-style: italic;
+  } */
+
+    .reveal ol,
+    .reveal dl,
+    .reveal ul {
+      display: inline-block;
+      text-align: left;
+      margin: 0 0 0 1em;
+    }
+
+    .reveal ol {
+      list-style-type: decimal;
+      text-align: left;
+    }
+
+    .reveal ul {
+      list-style-type: disc;
+      text-align: left;
+    }
+
+    .reveal ul ul {
+      list-style-type: square;
+      text-align: left;
+    }
+
+    .reveal ul ul ul {
+      list-style-type: circle;
+      text-align: left;
+    }
+
+    .reveal ul ul,
+    .reveal ul ol,
+    .reveal ol ol,
+    .reveal ol ul {
+      text-align: left;
+      display: block;
+      margin-left: 40px;
+    }
+
+    .reveal dt {
+      font-weight: bold;
+    }
+
+    .reveal dd {
+      margin-left: 40px;
+    }
+
+    .reveal blockquote {
+      display: block;
+      position: relative;
+      width: 100%;
+      margin: var(--r-block-margin) auto;
+      padding: 5px;
+      /* font-style: italic; */
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .reveal blockquote p:first-child,
+    .reveal blockquote p:last-child {
+      display: inline-block;
+    }
+
+    /* .reveal q {
+    font-style: italic;
+  } */
+    /* 
+    .reveal pre {
+      display: block;
+      position: relative;
+      width: 90%;
+      margin: var(--r-block-margin) auto;
+      text-align: left;
+      font-size: 0.55em;
+      font-family: var(--r-code-font);
+      line-height: 1.2em;
+      word-wrap: break-word;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+    } */
+
+
+    .reveal .slide-number {
+      background-color: transparent;
+      color: var(--r-footer-color);
+      text-align: center;
+      font-family: var(--r-heading-font);
+      font-size: var(--r-footer-size);
+      letter-spacing: normal;
+    }
+
+    code {
+      font-family: var(--r-code-font);
+      font-size: 0.9em;
+      text-transform: none;
+      /* tab-size: 2; */
+    }
+
+
+
+    .reveal pre code {
+      display: block;
+      /* padding: 5px; */
+      overflow: auto;
+      max-height: 400px;
+      word-wrap: normal;
+    }
+
+    /* .reveal pre code .hljs-comment{
+      color: red;
+    } */
+
+    /* .reveal .code-wrapper {
+      white-space: normal;
+    }
+
+    .reveal .code-wrapper code {
+      white-space: pre;
+    } */
+
+    .reveal table {
+      margin: auto;
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .reveal table th {
+      font-weight: bold;
+    }
+
+    .reveal table th,
+    .reveal table td {
+      text-align: left;
+      padding: 0.2em 0.5em 0.2em 0.5em;
+      border-bottom: 1px solid;
+    }
+
+    .reveal table th[align=center],
+    .reveal table td[align=center] {
+      text-align: center;
+    }
+
+    .reveal table th[align=right],
+    .reveal table td[align=right] {
+      text-align: right;
+    }
+
+    .reveal table tbody tr:last-child th,
+    .reveal table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .reveal sup {
+      vertical-align: super;
+      font-size: smaller;
+    }
+
+    .reveal sub {
+      vertical-align: sub;
+      font-size: smaller;
+    }
+
+    .reveal small {
+      display: inline-block;
+      font-size: 0.6em;
+      line-height: 1.2em;
+      vertical-align: top;
+    }
+
+    .reveal small * {
+      vertical-align: top;
+    }
+
+    .reveal img {
+      margin: var(--r-block-margin) 0;
+    }
+
+
+    /*********************************************
+      * LINKS
+      *********************************************/
+    .reveal a {
+      color: var(--r-link-color);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .reveal a:hover {
+      color: var(--r-link-color-hover);
+      text-shadow: none;
+      border: none;
+    }
+
+    .reveal .roll span:after {
+      color: #fff;
+      background: var(--r-link-color-dark);
+    }
+
+
+
+    /*********************************************
+      * Frame helper
+      *********************************************/
+    .reveal .r-frame {
+      border: 4px solid var(--r-main-color);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .reveal a .r-frame {
+      transition: all 0.15s linear;
+    }
+
+    .reveal a:hover .r-frame {
+      border-color: var(--r-link-color);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.55);
+    }
+
+    /*********************************************
+   * NAVIGATION CONTROLS
+   *********************************************/
+    .reveal .controls {
+      color: var(--r-link-color);
+    }
+
+
+    /*********************************************
+   * PROGRESS BAR
+   *********************************************/
+    .progress {
+      color: var(--r-link-color);
+      height: 0.4%;
+    }
+
+    /* .footer {
+      height: 10vh;
+      position: relative;
+      bottom: 0;
+      width: 100%;
+      background: aquamarine;
+    } */
+
+    .reveal .katex {
+      font-size: .85em !important;
+      font-family: "Computer Modern", sans-serif;
+    }
+
+    .reveal .katex-mathrm {
+      font-size: 1em;
+      font-family: "Computer Modern", sans-serif;
+    }
+
+    /*********************************************
+   * PRINT BACKGROUND
+   *********************************************/
+    @media print {
+      .backgrounds {
+        background-color: var(--r-background-color);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- TITLEPAGE -->
+      <section>
+        <section id="title-slide slide level1" data-timing="30">
+          <h1 class="title">Reservoir Modelling Workshop</h1>
+          <p class="subtitle">Buckley Leverett</p>
+          <p class="author">Sebastian Hogeweg</p>
+          <p class="institute">Clausthal University of Technology</p>
+          <p class="date">28<sup>th</sup> of May, 2024</p>
+        </section>
+      </section>
+
+      <section>
+        <section id="introduction-to-buckley-levertt" class="title-slide slide level1" data-timing="10">
+          <h1>Introduction into the theory of Buckley Leverett and numerical approaches</h1>
+        </section>
+
+
+        <section id="buckley-leverett-introduction" class="slide level2">
+          <h3>Immiscible displacement according to <a
+              href="https://onepetro.org/TRANS/article/146/01/107/161720/Mechanism-of-Fluid-Displacement-in-Sands">Buckley
+              Leverett [1942]</a></h3>
+          <figure>
+            <img data-src="assets/BuckleyLeverett.svg" style="width:70.0%" alt="BuckleyLeverett" />
+            <figcaption aria-hidden="true">Figure: Displacement of the non-wetting phase by the wetting phase for a
+              one-dimensional system</figcaption>
+          </figure>
+        </section>
+
+        <section id="buckley-leverett-introduction" class="slide level2">
+          <h3>Mathematical model of <a
+              href="https://onepetro.org/TRANS/article/146/01/107/161720/Mechanism-of-Fluid-Displacement-in-Sands">Buckley
+              Leverett [1942]</a></h3>
+          <ul>
+            <li> For a one-dimensional system, the change in saturation:</li>
+
+            <p>$$\frac{\partial S_p}{\partial t} = - \frac{u_T}{\phi} \frac{\partial f_p}{\partial x}$$</p>
+            <p>$$\text{with: }x>0, t>0, p = w, n$$</p>
+
+            <li> Partial differential equation by expanding the equation:</li>
+            <p>$$\frac{\partial S_p}{\partial t} = - \frac{u_T}{\phi} \frac{\mathrm{d} f_p}{\mathrm{d}
+              S_p}\frac{\partial S_p}{\partial x}$$</p>
+          </ul>
+        </section>
+
+        <section id="discretization-methods" class="slide level2">
+          <h3> Discretization methods</h3>
+          <ul>
+            <li> For numerical approaches discretization in time and space is required $\rightarrow$ The solution is
+              approximated at specific points in time and space</li>
+            <li> Spatial discretization:</li>
+            <ul>
+              <li>Finite Difference Method (FDM)</li>
+              <li>Finite Element Method (FEM)</li>
+              <li>Finite Volume Method (FVM)</li>
+            </ul>
+            <li> Temporal discretization:</li>
+            <ul>
+              <li> Explicit methods</li>
+              <li> Implicit methods</li>
+              <li> Implicit-Explicit methods</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section id="discretization-fdm" class="slide level2">
+          <h3> Spatial discretization - Finite difference method</h3>
+          <ul>
+            <li>The spatial domain is discretized by cells where the unknowns are located in the cell center</li>
+            <li> Finite difference assume that the storage is equal to the influx minus the eflux of the cells: </li>
+            <p> $$ \left(\frac{\partial f}{\partial x}\right)_i = \frac{f_{i+1/2} - f_{i-1/2}}{\Delta x} $$</p>
+          </ul>
+          <figure>
+            <img data-src="assets/Discretization.svg" style="width:50.0%" alt="Figure: Discretization" />
+            <figcaption aria-hidden="true">Figure: One dimensional discretization (cell-centered)</figcaption>
+          </figure>
+        </section>
+
+        <section id="discretization-fdm-methods" class="slide level2">
+          <h3>Spatial discretization - Finite difference method</h3>
+          <div class="columns">
+            <div class="column" style="width:50%;">
+              <ul>
+                <li> As the the exact values at the interface, the values are approximated</li>
+                <ul>
+                  <li>Forward difference
+                    $$\left( \frac{\partial f}{\partial x}\right)_i \approx \frac{f(x+\Delta x)- f(x)}{\Delta x}$$</li>
+                  <li>Backward difference</li>
+                  $$\left( \frac{\partial f}{\partial x}\right)_i \approx \frac{f(x)- f(x-\Delta x)}{\Delta x}$$</li>
+                  <li>Central difference
+                    $$\left( \frac{\partial f}{\partial x}\right)_i \approx \frac{\frac{1}{2}f(x+\Delta x)-
+                    \frac{1}{2}f(x-\Delta x)}{\Delta x}$$</li>
+                </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="column" style="width:50%;">
+              <p>
+              <figure>
+                <img data-src="assets/DifferenceMethod.svg" style="width:100.0%" alt="Figure: Difference methods" />
+                <figcaption aria-hidden="true">Figure: Difference methods</figcaption>
+                </figcaption>
+              </figure>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="temporal-discretization" class="slide level2">
+          <h3> Temporal discretization</h3>
+          <ul>
+            <li>In analogy to the spatial discretization, time is also evaluated at specific points
+              $$ \frac{\partial f}{\partial t} = \frac{f(t+\Delta t) - f(t)}{\Delta t}$$</il>
+            <li> Three options for replacement:</li>
+            <ul>
+              <li> Explicit Euler (forward) $u \rightarrow u^t$ </li>
+              <li> Implicit Euler (backward) $u \rightarrow u^{t+1}$ </li>
+              <li> Explicit-Implicit methods (e.g., Crank-Nicolson) </li>
+            </ul>
+          </ul>
+        </section>
+
+
+        <section id="final-conclusion-of-theory" class="slide level2">
+          <h3> Discretized formulation of Buckley-Leverett</h3>
+          <ul>
+            <li> Applying the discretization (temporal: implicit Euler, spatial: FDM (backward difference)) on the
+              initial PDE, leads to the following form:
+              $$\frac{S_{i}^{t+1} - S_{i}^t}{\Delta t} = - \frac{u_T}{\phi} \frac{\mathrm{d} f}{\mathrm{d} S}
+              \frac{S_{i}^{t+1}- S_{i-1}^{t+1}}{\Delta x}$$</li>
+            </li>
+            <li> With the assumption of $\frac{\mathrm{d}f}{\mathrm{d}S} = \text{const}$ and $\alpha = \frac{u_T}{\phi}
+              \frac{\mathrm{d}f}{\mathrm{d}S} \frac{\Delta t}{\Delta x}$: </li>
+            $$S_{i}^{t+1} + \alpha (S_{i}^{t+1} - S_{i-1}^{t+1}) = S_{i}^{t}$$
+            <li>Arrangement in matrix including boundary conditions:
+              $$\begin{bmatrix}
+              1+\alpha & 0 & \dots &0\\
+              -\alpha & 1+\alpha & \dots& 0\\
+              \vdots & \vdots & \ddots & \vdots\\
+              0 & \dots & -\alpha &1+\alpha\\
+              \end{bmatrix} \cdot \begin{bmatrix}
+              S^{t+1}_{1} \\
+              S^{t+1}_{2}\\
+              \vdots\\
+              S^{t+1}_{n} \end{bmatrix} = \begin{bmatrix}
+              S^t_{1}+\alpha\\
+              S^t_{2}\\
+              \vdots\\
+              S^t_{m}\\
+              \end{bmatrix}$$
+              
+            
+              <!-- $$S^{n+1} = (\mathbf{I} + \alpha)S^n 
+              \quad \text{ with: } \mathbf{I} + \alpha =
+              \begin{bmatrix}
+              1-\alpha & 0 & \dots &0\\
+              \alpha & 1-\alpha & \dots& 0\\
+              \vdots & \vdots & \ddots & \vdots\\
+              0 & \dots & \alpha &1-\alpha\\
+
+              \end{bmatrix}$$ -->
+            </li>
+          </ul>
+          <p> $\rightarrow$ System of linear equations (sparse matrix)</p>
+        </section>
+
+
+        <section>
+          <h3>Solving the system of linear equations </h3>
+          <ul>
+            <li> A system of linear equations can be simply solved (e.g. Gaussian elemination)</li>
+            <li>General form: $$A\mathbf{x} = \mathbf{b} $$</li>
+            $$ \text{with: } A = \begin{bmatrix}
+            a_{11} & a_{12} & \dots &a_{1n}\\
+            a_{21}& a_{22} & \dots& a_{2n}\\
+            \vdots & \vdots & \ddots & \vdots\\
+            a_{m1} & a_{m2} & \dots & a_{amn}\\
+            \end{bmatrix},\quad \mathbf{x} = \begin{bmatrix}
+            x_{1} \\
+            x_{2}\\
+            \vdots\\
+            x_{n}\\
+            \end{bmatrix},\quad \mathbf{b} = \begin{bmatrix}
+            b_{1} \\
+            b_{2}\\
+            \vdots\\
+            b_{m}\\
+            \end{bmatrix}$$
+            <li> Solving large and complex systems using python <code>numpy.linalg.solve()</code> or Matlab
+              <code>linsolve()</code> </li>
+          </ul>
+        </section>
+      </section>
+
+
+      <section>
+        <section id="numerical-implementation" class="title-slide slide level1">
+          <h1> Exercise 1 - Numerical implementation of Buckley Leverett</h1>
+        </section>
+
+        <section id="exercise1-task" class="slide level2">
+          <h3> Exercise 1 - task description</h3>
+          <ul>
+            <li>Write a python code which solves the 1 dimensional flow according to Buckley Leverett and use it to
+              determine the distribution of saturations</li>
+            <li>Given parameters:</li>
+            <ul>
+              <li>Flow velocity $u_T = 1\cdot10^{-5} \text{m/s}$</li>
+              <li>Porosity $\phi = 0.2$</li>
+              <li>Length $L = 100 \text{m}$</li>
+              <li>Number of elements $n_x = 100$</li>
+              <li>Simulation time $t_\text{end} = 500000 \text{s}$</li>
+              <li>Number of time steps $n_t = 50$</li>
+              <li>Initial gas saturation $S_g = 0$</li>
+            </ul>
+          </ul>
+        </section>
+
+        <section id="solution" class="slide level2">
+          <h3> Code implementation in python</h3>
+          <pre><code class="python" data-line-numbers="1-3|5-8|10-14|16-19|21-22|24-25|27-28|30-31|33-34|36-38|40-41|43-44|46-55|57-64">import numpy as np
+import matplotlib.pyplot as plt
+from numpy import linalg
+
+# Flow velocity v [m/s]
+u = 4e-5
+phi = 0.2
+v = u / phi
+
+# Spatial discretization
+length = 100
+elements = 100
+dx = length / elements
+x = np.linspace(0, length, elements)
+
+# Temporal discretization
+tEnd = 500000
+numberTimesteps = 50
+dt = int(tEnd / numberTimesteps)
+
+# Definiton of alpha
+alpha = v * (dt / dx)
+
+# Initial gas saturation
+Sg = 0
+
+# Define an identity matrix
+A = np.identity(elements) * (1 + alpha)
+
+# Define an identity matrix with shift downwards
+A += np.eye(elements, k=-1) * (-alpha)
+
+# Right hand side
+b = np.ones(elements) * Sg
+
+# Boundary condition
+boundary = np.zeros(elements)
+boundary[0] = alpha
+
+# Add boundary condition to the right hand side
+b += boundary
+
+# Store solutions
+solSn = []
+
+# Iteration over all timesteps
+for t in range(numberTimesteps):
+    # Solve linear equation system
+    Sn_x = np.linalg.solve(A, b)
+    # Update b and add boundary condition
+    b = Sn_x + boundary
+    # Append solution to the solution vector
+    solSn.append(Sn_x)
+    # Plot results
+    plt.plot(x, Sn_x)
+
+# Cosmetics
+plt.xlabel("x, m")
+plt.ylabel(r"$\mathrm{S_g}$, -")
+plt.ylim(0, 1)
+plt.xlim(0, 100)
+
+# Show plot
+plt.show()
+            </code></pre>
+        </section>
+
+        <section class="slide level2">
+          <h3> Results of the executed script</h3>
+          <figure>
+            <img data-src="assets/Buckley_Leverett_Animated.gif" style="width:70.0%"
+              alt="Figure: Results of the executed script" />
+            <figcaption aria-hidden="true">Figure: Results of the executed script</figcaption>
+          </figure>
+        </section>
+      </section>
+
+      <!-- <section id="exercise2" class="title-slide slide level1">
+        <section>
+          <h1>Exercise 2 - Numerical implementation of Buckley Leverett with saturation depending fractional flow</h1>
+        </section>
+
+        <section class ="slide level2">
+          <h3> Relative permeability</h3>
+          <ul>
+            <li>Usually, the term $\frac{\mathrm{d}f}{\mathrm{dS}}$ is not constant, morevover, relative permeability curves are introduced</li>
+          </ul>
+        </section>
+      </section> -->
+
+
+      <section>
+        <section id="thank-you-for-your-attention" class="title-slide slide level1">
+          <h1>Thank you for your attention!</h1>
+
+        </section>
+        <section class="slide level2">
+
+          <p>Sebastian Hogeweg</p>
+          <p>Contact: <a href="mailto:alexander.sebastian.hogeweg@tu-clausthal.de"
+              class="email">alexander.sebastian.hogeweg@tu-clausthal.de</a></p>
+        </section>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/zoom/zoom.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/math/math.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/highlight/highlight.js"></script>
+
+  <script>
+
+    // Full list of configuration options available at:
+    // https://revealjs.com/config/
+    Reveal.initialize({
+      // Display controls in the bottom right corner
+      controls: true,
+
+      // Help the user learn the controls by providing hints, for example by
+      // bouncing the down arrow when they first encounter a vertical slide
+      controlsTutorial: true,
+
+      // Determines where controls appear, "edges" or "bottom-right"
+      controlsLayout: 'bottom-right',
+
+      // Visibility rule for backwards navigation arrows; "faded", "hidden"
+      // or "visible"
+      controlsBackArrows: 'faded',
+
+      // Display a presentation progress bar
+      progress: true,
+
+      // Display the page number of the current slide
+      slideNumber: false,
+
+      // 'all', 'print', or 'speaker'
+      showSlideNumber: 'all',
+
+      // // Factor of the display size that should remain empty around
+      // // the content
+      // margin: 0.01,
+
+      // Add the current slide number to the URL hash so that reloading the
+      // page/copying the URL will return you to the same slide
+      hash: true,
+
+      // Start with 1 for the hash rather than 0
+      hashOneBasedIndex: false,
+
+      // Flags if we should monitor the hash and change slides accordingly
+      respondToHashChanges: true,
+
+      // Push each slide change to the browser history
+      history: false,
+
+      // Enable keyboard shortcuts for navigation
+      keyboard: true,
+
+      // Enable the slide overview mode
+      overview: true,
+
+      // Disables the default reveal.js slide layout (scaling and centering)
+      // so that you can use custom CSS layout
+      disableLayout: false,
+
+      // Vertical centering of slides
+      center: true,
+
+      // Enables touch navigation on devices with touch input
+      touch: true,
+
+      // Loop the presentation
+      loop: false,
+
+      // Change the presentation direction to be RTL
+      rtl: false,
+
+      // see https://revealjs.com/vertical-slides/#navigation-mode
+      navigationMode: 'default',
+
+      // Randomizes the order of slides each time the presentation loads
+      shuffle: false,
+
+      // Turns fragments on and off globally
+      fragments: true,
+
+      // Flags whether to include the current fragment in the URL,
+      // so that reloading brings you to the same fragment position
+      fragmentInURL: true,
+
+      // Flags if the presentation is running in an embedded mode,
+      // i.e. contained within a limited portion of the screen
+      embedded: false,
+
+      // Flags if we should show a help overlay when the questionmark
+      // key is pressed
+      help: true,
+
+      // Flags if it should be possible to pause the presentation (blackout)
+      pause: true,
+
+      // Flags if speaker notes should be visible to all viewers
+      showNotes: false,
+
+      // Global override for autoplaying embedded media (null/true/false)
+      autoPlayMedia: null,
+
+      // Global override for preloading lazy-loaded iframes (null/true/false)
+      preloadIframes: true,
+
+      // Number of milliseconds between automatically proceeding to the
+      // next slide, disabled when set to 0, this value can be overwritten
+      // by using a data-autoslide attribute on your slides
+      autoSlide: false,
+
+      // Stop auto-sliding after user input
+      autoSlideStoppable: false,
+
+      // Use this method for navigation when auto-sliding
+      autoSlideMethod: null,
+
+      // Specify the average time in seconds that you think you will spend
+      // presenting each slide. This is used to show a pacing timer in the
+      // speaker view
+      defaultTiming: 50,
+
+      // Enable slide navigation via mouse wheel
+      mouseWheel: false,
+
+      // The display mode that will be used to show slides
+      display: 'block',
+
+      // Hide cursor if inactive
+      hideInactiveCursor: true,
+
+      // Time before the cursor is hidden (in ms)
+      hideCursorTime: 5000,
+
+      // Opens links in an iframe preview overlay
+      previewLinks: false,
+
+      // Transition style (none/fade/slide/convex/concave/zoom)
+      transition: 'slide',
+
+      // Transition speed (default/fast/slow)
+      transitionSpeed: 'default',
+
+      // Transition style for full page slide backgrounds
+      // (none/fade/slide/convex/concave/zoom)
+      backgroundTransition: 'fade',
+
+      // Number of slides away from the current that are visible
+      viewDistance: 3,
+
+      // Number of slides away from the current that are visible on mobile
+      // devices. It is advisable to set this to a lower number than
+      // viewDistance in order to save resources.
+      mobileViewDistance: 2,
+
+
+      // reveal.js plugins
+      plugins: [
+        RevealMath,
+        RevealSearch,
+        RevealZoom,
+        RevealMath.KaTeX,
+        RevealNotes,
+        RevealHighlight
+      ]
+    });
+  </script>
+
+
+
+  <style type="text/css">
+    #footer-center {
+      position: absolute;
+      bottom: -1%;
+      left: .8%;
+      color: var(--r-footer-color);
+      text-align: center;
+      font-family: var(--r-heading-font);
+      font-size: var(--r-footer-size);
+    }
+  </style>
+</body>
+
+</html>
