@@ -1106,7 +1106,8 @@ Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
 
       <section id="Exercise-3" class="title-slide slide level1">
         <section>
-          <h1>Exercise 3 - Implementation of Buckley Leverett with saturation dependent fractional flow curves in python</h1>
+          <h1>Exercise 3 - Implementation of Buckley Leverett with saturation dependent fractional flow curves in python
+          </h1>
         </section>
         <section id="implementation-buckley-leverett" class="slide level2">
           <h3>Implementation for Buckley Leverett</h3>
@@ -1123,17 +1124,17 @@ Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
                     $$ \mathbf{J}(S^i) \Delta S^i = R^{i}$$</li>
                   <li> Calculation of better solution
                     $$S^{i+1} = S^i - \Delta S^i $$</li>
-                    <li> Stopping criteria based on number of iterations and relative empirical-correlation
-                      $$\frac{\sum_{i=0}^{n} |S^{i+1} - S^i|}{\sum_{i=0}^{n} |S^{i}|} < \varepsilon$$</li>
-                    </li>
-                    </li>
-                </ul>
-              </ol>
+                  <li> Stopping criteria based on number of iterations and relative empirical-correlation
+                    $$\frac{\sum_{i=0}^{n} |S^{i+1} - S^i|}{\sum_{i=0}^{n} |S^{i}|} < \varepsilon$$</li>
+                  </li>
             </li>
+          </ul>
+          </ol>
+          </li>
           </ul>
         </section>
 
-        <section id="Exercise3-description" class = "slide level2">
+        <section id="Exercise3-description" class="slide level2">
           <h3> Exercise 2 - task description</h3>
           <ul>
             <li>Write a python code which solves the 1 dimensional flow according to Buckley Leverett and use it to
@@ -1151,7 +1152,8 @@ Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
               <li>Maximum number of Newton iterations $n = 15$ and relative error $\varepsilon = 1e-5$</li>
               <li>Relative permeabilities $$k_{rw} = (1-S_n)^2 \quad\land \quad k_{rn} = S_n^2 $$</li>
             </ul>
-          </ul>     
+          </ul>
+        </section>
       </section>
 
       <section>
