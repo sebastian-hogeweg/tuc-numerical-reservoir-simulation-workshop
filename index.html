@@ -506,22 +506,22 @@
 
       <!-- TITLEPAGE -->
       <section>
-        <section id="title-slide slide level1" data-timing="30">
+        <section id="title-slide slide level1">
           <h1 class="title">Reservoir Modelling Workshop</h1>
           <p class="subtitle">Buckley Leverett</p>
           <p class="author">Sebastian Hogeweg</p>
           <p class="institute">Clausthal University of Technology</p>
-          <p class="date">28<sup>th</sup> of May, 2024</p>
+          <p class="date">Summer 2024</p>
         </section>
       </section>
 
       <section>
-        <section id="introduction-to-buckley-levertt" class="title-slide slide level1" data-timing="10">
+        <section id="introduction-to-buckley-leverett" class="title-slide slide level1">
           <h1>Introduction into the theory of Buckley Leverett and numerical approaches</h1>
         </section>
 
 
-        <section id="buckley-leverett-introduction" class="slide level2">
+        <section id="buckley-leverett-introduction1" class="slide level2">
           <h3>Immiscible displacement according to <a
               href="https://onepetro.org/TRANS/article/146/01/107/161720/Mechanism-of-Fluid-Displacement-in-Sands">Buckley
               Leverett [1942]</a></h3>
@@ -532,7 +532,7 @@
           </figure>
         </section>
 
-        <section id="buckley-leverett-introduction" class="slide level2">
+        <section id="buckley-leverett-introduction2" class="slide level2">
           <h3>Mathematical model of <a
               href="https://onepetro.org/TRANS/article/146/01/107/161720/Mechanism-of-Fluid-Displacement-in-Sands">Buckley
               Leverett [1942]</a></h3>
@@ -653,8 +653,8 @@
               \vdots\\
               S^t_{m}\\
               \end{bmatrix}$$
-              
-            
+
+
               <!-- $$S^{n+1} = (\mathbf{I} + \alpha)S^n 
               \quad \text{ with: } \mathbf{I} + \alpha =
               \begin{bmatrix}
@@ -692,7 +692,8 @@
             b_{m}\\
             \end{bmatrix}$$
             <li> Solving large and complex systems using python <code>numpy.linalg.solve()</code> or Matlab
-              <code>linsolve()</code> </li>
+              <code>linsolve()</code>
+            </li>
           </ul>
         </section>
       </section>
@@ -723,7 +724,7 @@
 
         <section id="solution" class="slide level2">
           <h3> Code implementation in python</h3>
-          <pre><code class="python" data-line-numbers="1-3|5-8|10-14|16-19|21-22|24-25|27-28|30-31|33-34|36-38|40-41|43-44|46-55|57-64">import numpy as np
+          <pre><code class="python">import numpy as np
 import matplotlib.pyplot as plt
 from numpy import linalg
 
@@ -800,19 +801,358 @@ plt.show()
         </section>
       </section>
 
-      <!-- <section id="exercise2" class="title-slide slide level1">
-        <section>
-          <h1>Exercise 2 - Numerical implementation of Buckley Leverett with saturation depending fractional flow</h1>
+      <section>
+        <section id="formulation-saturation-dependent-fractional-flow-1" class="title-slide slide level1">
+          <h1>Formulation of Buckley Leverett with saturation depending fractional flow</h1>
         </section>
 
-        <section class ="slide level2">
-          <h3> Relative permeability</h3>
+        <section id="saturation-dependent-fractional-flow" class="slide level2">
+          <h3> Saturation dependent fractional flow</h3>
           <ul>
-            <li>Usually, the term $\frac{\mathrm{d}f}{\mathrm{dS}}$ is not constant, morevover, relative permeability curves are introduced</li>
+            <li>Usually, the term $\frac{\mathrm{d}f}{\mathrm{dS}}$ is not constant, morevover, the mobility ratio
+              becomes relevant during the displacement process</li>
+          </ul>
+          $$ q_w = \frac{k_{rw}}{\mu_w} \frac{\mathrm{d}p}{\mathrm{d}x} \quad q_n = \frac{k_{rn}}{\mu_n}
+          \frac{\mathrm{d}p}{\mathrm{d}x}$$
+          $$ f_w = \frac{q_w}{q_w + q_n}$$
+          $$ f_w = \frac{\frac{k_{rw}}{\mu_w}}{\frac{k_{rw}}{\mu_w} + \frac{k_{rn}}{\mu_n}} =
+          \frac{1}{1+\frac{k_{rn}\mu_w}{k_{rw}\mu_n}}$$
+        </section>
+
+        <section id="buckley-leverett-part2" class="slide level2">
+          <h3>Considering saturation dependent fractional flow in Buckley Leverett Problem</a></h3>
+          <ul>
+            <li> For a one-dimensional system, the change in saturation:</li>
+
+            <p>$$\frac{\partial S_p}{\partial t} = - \frac{u_T}{\phi} \frac{\partial f_p}{\partial x}$$</p>
+            <p>$$\text{with: }x>0, t>0, p = w, n$$</p>
+
+            <li> With knowledge from previous session the term can be transformed into:
+              $$\frac{S_{i}^{t+1} - S_{i}^t}{\Delta t} = - \frac{u_T}{\phi} \frac{f_{i}^{t+1}- f_{i-1}^{t+1}}{\Delta
+              x}$$
+              or
+              $$S_{i}^{t+1} - S_i^t + \frac{u_T}{\phi} \frac{\Delta t}{\Delta x} (f_{i}^{t+1} - f_{i-1}^{t+1} ) = 0$$
+            </li>
           </ul>
         </section>
-      </section> -->
 
+        <section id="lineraization-and-residual" class="slide level2">
+          <h3>Linearization by using the residual</h3>
+          <ul>
+            <li>Due to the non-linear behavior of the fractional flow, the term can be linearized by using the residual
+              form:
+              $$S_{i}^{t+1} - S_i^t + \frac{u_T}{\phi} \frac{\Delta t}{\Delta x} (f_{i}^{t+1} - f_{i-1}^{t+1} ) = 0
+              \overset{!}{=} R^{t+1}_i$$
+            </li>
+            <li>The solution is approximated in an iterative process (Newton's/Newton Raphson method)</li>
+            <li>The iterative process uses the differential which requires solving a linear system of equations</li>
+          </ul>
+        </section>
+
+        <!-- <section  id = "residual-form" class="slide level2">
+          <h3> Considering saturation dependent fractional flow in Buckley Leverett Problem - Residual form</h3>
+          <ul>
+            <li> The saturation dependent fractional flow can be included in the Buckley Leverett equation by excluding
+              the term $ \frac{\mathrm{d}f}{\mathrm{d}S} $ from the constant term $\alpha$</li>
+            $$\frac{S_{i}^{t+1} - S_{i}^t}{\Delta t} = - \frac{u_T}{\phi} \frac{\mathrm{d} f}{\mathrm{d} S}
+            \frac{S_{i}^{t+1}- S_{i-1}^{t+1}}{\Delta x}$$
+            <li>This modification results in a system of nonlinear equations</li>
+            <li>Nonlinear systems of eqution are often solved using the Newton's method (also: Newton-Raphson)</li>
+          </ul>
+        </section> -->
+
+        <section class="slide level2">
+          <h3> Newton's method</h3>
+          <div class="columns">
+            <div class="column" style="width: 60%;">
+              <ul>
+                <li> Newton's method is an iterative method to find the roots of a function</li>
+                <li> The method is based on the following formula:</li>
+                $$x_1 = x_0 - \frac{f(x_0)}{f'(x_0)} \quad \text{or:} \quad \mathbf{x}_{k+1} = \mathbf{x}_k -
+                \mathbf{J}^{-1}(\mathbf{x}_k) \mathbf{f}(\mathbf{x}_k)$$
+                with:
+                $$\mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} &
+                \dots & \frac{\partial f_1}{\partial x_n} \\
+                \frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} &
+                \dots & \frac{\partial f_2}{\partial x_n} \\
+                \vdots & \vdots & \ddots & \vdots \\
+                \frac{\partial f_n}{\partial x_1} & \frac{\partial f_n}{\partial x_2} &
+                \dots & \frac{\partial f_n}{\partial x_n} \\
+                \end{bmatrix}$$
+              </ul>
+            </div>
+            <div class="column" style="width:50%;">
+              <figure>
+                <img data-src="assets/NewtonIteration.gif" style="width:100.0%"
+                  alt="Figure: Results of the executed script" />
+                <figcaption aria-hidden="true">Figure: Newton iteration from <a
+                    href="https://de.wikipedia.org/wiki/Newtonverfahren#/media/Datei:NewtonIteration_Ani.gif"> Pfeiffer
+                    [2005]</a></figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide level2">
+          <h3> Determination of the differential $f\prime (x)$</h3>
+          <ul>
+            <li> For simplified problems the differential can be calculated manually $$ f(x) = x^2, f\prime (x) = 2x$$
+            </li>
+            <li> For more complex problems, the differential can be approximate by using the following term: $$ f\prime
+              (x) = \frac{f(x+\varepsilon) + f(x-\varepsilon)}{2\varepsilon}$$ where $\varepsilon$ is a small value
+              (e.g. $\varepsilon = 1\cdot 10^{-6}$)</li>
+          </ul>
+
+        </section>
+
+        <section class="slide level2 ">
+          <h3>Convergence criteria </h3>
+          <ul>
+            <li> The process of approaching a solution is called convergence</li>
+            <li> For the Newton-Raphson method the convergence is at least quadratic</li>
+            <li> Stopping criteria has to be defined:
+              <ul>
+                <li> Number of maximum time steps (e.g. $n_\text{max} = 100$)</li>
+                <li> Tolerance between 0 and $f(x)$ (e.g. $\varepsilon = 10^{-6}$)</li>
+              </ul>
+            </li>
+            <li> Newton's method can face issues when several zero roots are close to each other resulting in
+              oscillatory behavior</li>
+            <li> Initial guess $x_0$ is relevant if multiple zero roots are availabe and also influences the convergence
+              rate</li>
+          </ul>
+
+        </section>
+      </section>
+
+      <section>
+        <section id="exercise-newton-raphson" class="title-slide slide level1">
+          <h1>Exercise 2 - Implementation of Newton-Raphson in python</h1>
+        </section>
+        <section class="slide level2">
+          <h3> Exercise Newton-Raphson method</h3>
+          <ul>
+            <li>Implement the Newton-Raphson method as a function to find the root of the following equation:
+              $$f(x) = x^2 - 4x -3$$
+              Use for the determination of the differential
+              <ol type="A">
+                <li>Manually</li>
+                <li>Aprroximation</li>
+              </ol>
+            <li> The analytical solution can for the root zeros can be calculated by:
+              $$x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+            </li>
+            </li>
+          </ul>
+        </section>
+
+        <section id="solution-ex2" class="slide level2">
+          <h3> Code implementation in python</h3>
+          <pre><code class="python">import numpy as np
+import matplotlib.pyplot as plt
+
+# Function to solve
+def func(x):
+    return x**2 - 4 * x - 3
+
+
+# Quadratic formula
+def quadraticFormula(a, b, c):
+    return (-b + np.sqrt(b**2 - 4 * a * c)) / (2 * a), (
+        -b - np.sqrt(b**2 - 4 * a * c)
+    ) / (2 * a)
+
+
+# Analytical solution
+def analyticalSolution():
+    return quadraticFormula(1, -4, -3)
+
+
+# Differential calculated manually
+def manualDifferential(func, x):
+    return 2 * x - 4
+
+
+# Differential approximated
+def approximatedDifferential(func, x, eps=1e-6):
+    return (func(x + eps) - func(x - eps)) / (2 * eps)
+
+
+# Newton-Raphson method
+def newtonRaphson(func, diff, x0, maxIter=100, tol=1e-12):
+    sol = [x0]
+    x = x0
+    for i in range(maxIter):
+        print(f"It: {i+1}, x: {x},\t f(x): {func(x)}")
+        x = x - func(x) / diff(func, x)
+        sol.append(x)
+        if abs(func(x)) < tol:
+            break
+    return sol
+
+
+# Plot the slope in matplotlib (optional)
+def plotSlope(func, diff, sol, L=1):
+    for i in range(len(sol)):
+        x = sol[i]
+        y = func(x)
+        slope = diff(func, x)
+        x1 = np.linspace(x - L, x + L, 100)
+        y1 = slope * (x1 - x) + y
+        plt.plot(x1, y1, label=f"Iteration {i}")
+        plt.legend()
+        plt.savefig(f"plot_iteration_{i}.svg", bbox_inches="tight", transparent=True)
+
+# Define initial value
+x0 = -3
+
+# Solve the function
+print("Manually calculated differential")
+xMan = newtonRaphson(func, manualDifferential, x0)
+
+print("Approximated differential")
+xApprox = newtonRaphson(func, approximatedDifferential, x0)
+
+# Analytical solution
+results = analyticalSolution()
+print(f"Analytical solution: {results}")
+
+# Plot results
+x = np.linspace(-5, 5, 100)
+plt.plot(x, func(x), linestyle="--", label="f(x)")
+plt.legend()
+plt.grid(True)
+plotSlope(func, approximatedDifferential, xMan)
+plt.close()</code></pre>
+        </section>
+        <section class="slide level2">
+          <h3> Results of the executed script (1/2)</h3>
+          <div class="columns">
+            <div class="column" style="width: 58%;">
+              <pre><code class="bash">x0 = -3
+Manually calculated differential
+It: 1, x: -3,	 f(x): 18
+It: 2, x: -1.2,	 f(x): 3.24
+It: 3, x: -0.69375,	 f(x): 0.25628906250000005
+It: 4, x: -0.6461789443155452,	 f(x): 0.0022630053389334215
+It: 5, x: -0.6457513456182246,	 f(x): 1.8284064573492742e-07
+Approximated differential
+It: 1, x: -3,	 f(x): 18
+It: 2, x: -1.2000000002516003,	 f(x): 3.240000001610242
+It: 3, x: -0.6937499999794293,	 f(x): 0.25628906238917537
+It: 4, x: -0.6461789443146462,	 f(x): 0.0022630053341754497
+It: 5, x: -0.6457513456182398,	 f(x): 1.8284072655916361e-07
+Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
+            </div>
+            <div class="column" style="width:42%;">
+              <div class="r-stack">
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_0.svg" style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_1.svg" style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_2.svg" style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_3.svg" style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_4.svg" style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0-3Approx/plot_iteration_5.svg" style="width:100.0%" />
+              </div>
+              <figcaption aria-hidden="true">Figure: Result of Newton iterations</figcaption>
+            </div>
+          </div>
+
+        </section>
+
+        <section class="slide level2">
+          <h3> Results of the executed script (2/2)</h3>
+          <div class="columns">
+            <div class="column" style="width: 58%;">
+              <pre><code class="bash">x0 = 3
+Manually calculated differential
+It: 1, x: 3,	 f(x): -6
+It: 2, x: 6.0,	 f(x): 9.0
+It: 3, x: 4.875,	 f(x): 1.265625
+It: 4, x: 4.654891304347826,	 f(x): 0.04844783790170126
+It: 5, x: 4.64576704419029,	 f(x): 8.325212342441546e-05
+It: 6, x: 4.645751311111369,	 f(x): 2.475282201430673e-10
+Approximated differential
+It: 1, x: 3,	 f(x): -6
+It: 2, x: 5.999999999580666,	 f(x): 8.999999996645329
+It: 3, x: 4.87500000015725,	 f(x): 1.265625000904187
+It: 4, x: 4.654891304336093,	 f(x): 0.04844783783940443
+It: 5, x: 4.645767044189549,	 f(x): 8.325211950221956e-05
+It: 6, x: 4.645751311111372,	 f(x): 2.475424309977825e-10
+Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
+            </div>
+            <div class="column" style="width:42%;">
+              <div class="r-stack">
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_0.svg"
+                  style="width:100.0%" />
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_1.svg"
+                  style="width:100.0%" />
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_2.svg"
+                  style="width:100.0%" />
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_3.svg"
+                  style="width:100.0%" />
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_4.svg"
+                  style="width:100.0%" />
+                <img class="fragment current-visible" data-src="assets/Newton/x0+3Approx/plot_iteration_5.svg"
+                  style="width:100.0%" />
+                <img class="fragment" data-src="assets/Newton/x0+3Approx/plot_iteration_6.svg" style="width:100.0%" />
+              </div>
+              <figcaption aria-hidden="true">Figure: Result of Newton iterations</figcaption>
+            </div>
+          </div>
+
+        </section>
+
+      </section>
+
+      <section id="Exercise-3" class="title-slide slide level1">
+        <section>
+          <h1>Exercise 3 - Implementation of Buckley Leverett with saturation dependent fractional flow curves in python</h1>
+        </section>
+        <section id="implementation-buckley-leverett" class="slide level2">
+          <h3>Implementation for Buckley Leverett</h3>
+          <ul>
+            <li>Steps for the implementation of Buckley Leverett:
+              <ol>
+                <li> Implement residual function
+                  <!-- $$R^{t+1}_i = S_{i}^{t+1} - S_i^t + \frac{u_T}{\phi} \frac{\Delta t}{\Delta x} (f_{i}^{t+1} - f_{i-1}^{t+1} ) $$ -->
+                </li>
+                <li>Implement Jacobian matrix using the approximated differetation</li>
+                <li>Implement Newton iteration including </li>
+                <ul>
+                  <li> Linear equation system
+                    $$ \mathbf{J}(S^i) \Delta S^i = R^{i}$$</li>
+                  <li> Calculation of better solution
+                    $$S^{i+1} = S^i - \Delta S^i $$</li>
+                    <li> Stopping criteria based on number of iterations and relative empirical-correlation
+                      $$\frac{\sum_{i=0}^{n} |S^{i+1} - S^i|}{\sum_{i=0}^{n} |S^{i}|} < \varepsilon$$</li>
+                    </li>
+                    </li>
+                </ul>
+              </ol>
+            </li>
+          </ul>
+        </section>
+
+        <section id="Exercise3-description" class = "slide level2">
+          <h3> Exercise 2 - task description</h3>
+          <ul>
+            <li>Write a python code which solves the 1 dimensional flow according to Buckley Leverett and use it to
+              determine the distribution of saturations</li>
+            <li>Given parameters:</li>
+            <ul>
+              <li>Flow velocity $u_T = 4\cdot10^{-5} \text{m/s}$</li>
+              <li>Porosity $\phi = 0.2$</li>
+              <li>Length $L = 40 \text{m}$</li>
+              <li>Number of elements $n_x = 40$</li>
+              <li>Simulation time $t_\text{end} = 300000 \text{s}$</li>
+              <li>Number of time steps $n_t = 30$</li>
+              <li>Initial gas saturation $S_g = 0.1$</li>
+              <li>Viscosity ratio $\mu_w/\mu_n = 10$</li>
+              <li>Maximum number of Newton iterations $n = 15$ and relative error $\varepsilon = 1e-5$</li>
+              <li>Relative permeabilities $$k_{rw} = (1-S_n)^2 \quad\land \quad k_{rn} = S_n^2 $$</li>
+            </ul>
+          </ul>     
+      </section>
 
       <section>
         <section id="thank-you-for-your-attention" class="title-slide slide level1">
@@ -845,6 +1185,12 @@ plt.show()
     Reveal.initialize({
       // Display controls in the bottom right corner
       controls: true,
+
+      // Activate the scroll view
+      // view: 'scroll',
+
+      // Force the scrollbar to remain visible
+      // scrollProgress: true,
 
       // Help the user learn the controls by providing hints, for example by
       // bouncing the down arrow when they first encounter a vertical slide
