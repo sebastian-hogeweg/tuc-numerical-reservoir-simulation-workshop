@@ -845,7 +845,7 @@ plt.show()
               \overset{!}{=} R^{t+1}_i$$
             </li>
             <li>The solution is approximated in an iterative process (Newton's/Newton Raphson method)</li>
-            <li>The iterative process uses the differential which requires solving a linear system of equations</li>
+            <li>The iterative process uses the derivative which requires solving a linear system of equations</li>
           </ul>
         </section>
 
@@ -894,11 +894,11 @@ plt.show()
         </section>
 
         <section class="slide level2">
-          <h3> Determination of the differential $f\prime (x)$</h3>
+          <h3> Determination of the derivative $f\prime (x)$</h3>
           <ul>
-            <li> For simplified problems the differential can be calculated manually $$ f(x) = x^2, f\prime (x) = 2x$$
+            <li> For simplified problems the derivative can be calculated manually $$ f(x) = x^2, f\prime (x) = 2x$$
             </li>
-            <li> For more complex problems, the differential can be approximate by using the following term: $$ f\prime
+            <li> For more complex problems, the derivative can be approximate by using the following term: $$ f\prime
               (x) = \frac{f(x+\varepsilon) + f(x-\varepsilon)}{2\varepsilon}$$ where $\varepsilon$ is a small value
               (e.g. $\varepsilon = 1\cdot 10^{-6}$)</li>
           </ul>
@@ -934,10 +934,10 @@ plt.show()
           <ul>
             <li>Implement the Newton-Raphson method as a function to find the root of the following equation:
               $$f(x) = x^2 - 4x -3$$
-              Use for the determination of the differential
+              Use for the determination of the derivative
               <ol type="A">
                 <li>Manually</li>
-                <li>Aprroximation</li>
+                <li>Approximation</li>
               </ol>
             <li> The analytical solution can for the root zeros can be calculated by:
               $$x_{1,2} = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
@@ -1007,10 +1007,10 @@ def plotSlope(func, diff, sol, L=1):
 x0 = -3
 
 # Solve the function
-print("Manually calculated differential")
+print("Manually calculated derivative")
 xMan = newtonRaphson(func, manualDifferential, x0)
 
-print("Approximated differential")
+print("Approximated derivative")
 xApprox = newtonRaphson(func, approximatedDifferential, x0)
 
 # Analytical solution
@@ -1030,13 +1030,13 @@ plt.close()</code></pre>
           <div class="columns">
             <div class="column" style="width: 58%;">
               <pre><code class="bash">x0 = -3
-Manually calculated differential
+Manually calculated derivative
 It: 1, x: -3,	 f(x): 18
 It: 2, x: -1.2,	 f(x): 3.24
 It: 3, x: -0.69375,	 f(x): 0.25628906250000005
 It: 4, x: -0.6461789443155452,	 f(x): 0.0022630053389334215
 It: 5, x: -0.6457513456182246,	 f(x): 1.8284064573492742e-07
-Approximated differential
+Approximated derivative
 It: 1, x: -3,	 f(x): 18
 It: 2, x: -1.2000000002516003,	 f(x): 3.240000001610242
 It: 3, x: -0.6937499999794293,	 f(x): 0.25628906238917537
@@ -1064,14 +1064,14 @@ Analytical solution: (4.645751311064591, -0.6457513110645907)</code></pre>
           <div class="columns">
             <div class="column" style="width: 58%;">
               <pre><code class="bash">x0 = 3
-Manually calculated differential
+Manually calculated derivative
 It: 1, x: 3,	 f(x): -6
 It: 2, x: 6.0,	 f(x): 9.0
 It: 3, x: 4.875,	 f(x): 1.265625
 It: 4, x: 4.654891304347826,	 f(x): 0.04844783790170126
 It: 5, x: 4.64576704419029,	 f(x): 8.325212342441546e-05
 It: 6, x: 4.645751311111369,	 f(x): 2.475282201430673e-10
-Approximated differential
+Approximated derivative
 It: 1, x: 3,	 f(x): -6
 It: 2, x: 5.999999999580666,	 f(x): 8.999999996645329
 It: 3, x: 4.87500000015725,	 f(x): 1.265625000904187
